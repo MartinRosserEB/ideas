@@ -52,7 +52,7 @@ class IdeaRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('i')
             ->where('i.ideaId = :ideaId')
-            ->orderBy('i.datetime', 'ASC')
+            ->orderBy('i.datetime', 'DESC')
             ->setParameter('ideaId', $ideaId)
             ->getQuery()
             ->execute();

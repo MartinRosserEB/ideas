@@ -23,6 +23,16 @@ class User implements UserInterface
     private $email;
 
     /**
+     * @ORM\Column(type="string", length=180)
+     */
+    private $firstName;
+
+    /**
+     * @ORM\Column(type="string", length=180)
+     */
+    private $familyName;
+
+    /**
      * @ORM\Column(type="json")
      */
     private $roles = [];
@@ -55,6 +65,26 @@ class User implements UserInterface
         return $this;
     }
 
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+    }
+
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    public function setFamilyName($familyName)
+    {
+        $this->familyName = $familyName;
+    }
+
+    public function getFamilyName()
+    {
+        return $this->familyName;
+    }
+
     /**
      * A visual identifier that represents this user.
      *
@@ -62,7 +92,11 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        if ($this->firstName && $this->familyName) {
+            return $this->firstName.' '.$this->familyName;
+        } else {
+            return (string) $this->email;
+        }
     }
 
     /**

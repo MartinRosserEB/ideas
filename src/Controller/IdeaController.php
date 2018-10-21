@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\AdminSettings;
 use App\Entity\Comment;
 use App\Entity\Idea;
 use App\Entity\Vote;
@@ -20,9 +21,14 @@ class IdeaController extends AbstractController
     public function index()
     {
         $em = $this->getDoctrine()->getManager();
+        $adminSettings = $em->getRepository(AdminSettings::class)->findOneById(1);
+        if (!$adminSettings) {
+            $adminSettings = new AdminSettings();
+        }
 
         return $this->render('index/index.html.twig', [
             'ideas' => $em->getRepository(Idea::class)->findLatestDistinctIdeas(),
+            'settings' => $adminSettings,
         ]);
     }
 

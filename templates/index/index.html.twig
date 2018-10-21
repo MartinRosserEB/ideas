@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="cell">
-    <a href="{{ path('create_idea') }}">Neue Idee erfassen</a>
+    <a href="{{ path('create_idea') }}">Neue Idee erfassen</a>{% if is_granted('ROLE_ADMIN') %} | <a href="{{ path('show_users') }}">Administration</a>{% endif %}
 </div>
 <div class="cell">
     <table>
@@ -13,7 +13,7 @@
             <td><a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a></td>
             <td><a href="{{ path('show_idea', {'entity': idea.id}) }}">anzeigen</a></td>
             <td><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('comment_idea', {'entity': idea.id}) }}');">kommentieren</a></td>
-            <td><a href="{{ path('vote_for_idea', {'entity': idea.id}) }}">+1</a></td>
+            {% if settings.votingActive|default(false) %}<td><a href="{{ path('vote_for_idea', {'entity': idea.id}) }}">+1</a></td>{% endif %}
         </tr>
     {% endfor %}
     </table>

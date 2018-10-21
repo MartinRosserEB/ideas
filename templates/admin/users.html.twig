@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="cell">
+    <a href="{{ path('ideas_index') }}">Zurück zur Ideenübersicht</a> | <a href="{{ path('create_user') }}">Benutzer erstellen</a> | <a href="{{ path('edit_admin_settings') }}">Einstellungen bearbeiten (E-Mailvorlage etc.)</a> | <a href="{{ path('send_mail') }}">Mail an alle Benutzer versenden</a>
+</div>
+
+<div class="cell">
+    <table>
+        <thead>
+            <tr>
+                <th>Vorname</th>
+                <th>Nachname</th>
+                <th>E-Mail</th>
+                <th>Login-URL</th>
+                <th>Aktion</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.familyName }}</td>
+                <td>{{ user.email }}</td>
+                <td><a href="{{ app.request.getSchemeAndHttpHost() }}?u={{ user.apiToken }}">{{ app.request.getSchemeAndHttpHost() }}?u={{ user.apiToken }}</a></td>
+                <td><a href="{{ path('edit_user', {'user': user.id}) }}">bearbeiten</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

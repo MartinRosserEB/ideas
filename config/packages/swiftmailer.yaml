@@ -1,3 +1,3 @@
 swiftmailer:
-    url: '%env(MAILER_URL)%'
+    url: 'smtp://everest.metanet.ch:465?encryption=ssl&auth_mode=login&username=ideen@mrosser.ch&password=vpY1z7_6'
     spool: { type: 'memory' }

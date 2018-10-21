@@ -2,23 +2,32 @@
 
 namespace App\Form;
 
-use App\Entity\Comment;
+use App\Entity\AdminSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * @author mrosser
  */
-class CommentType extends AbstractType
+class AdminSettingsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('comment', TextareaType::class, [
-                'label' => 'Kommentar',
+            ->add('mailSubject', TextType::class, [
+                'label' => 'E-Mailbetreff'
+            ])
+            ->add('mailText', TextareaType::class, [
+                'label' => 'E-Mailvorlage'
+            ])
+            ->add('votingActive', CheckboxType::class, [
+                'label' => 'Wahlmodus aktivieren',
+                'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Speichern'
@@ -29,7 +38,7 @@ class CommentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => Comment::class,
+            'data_class' => AdminSettings::class,
         ));
     }
 }
