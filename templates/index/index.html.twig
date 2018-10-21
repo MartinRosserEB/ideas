@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="cell">
+    <a href="{{ path('create_idea') }}">Neue Idee erfassen</a>
+</div>
+<div class="cell">
+    <table>
+    {% for idea in ideas %}
+        <tr>
+            <td><strong>{{ idea.title }}</strong></td>
+            <td>{{ idea.description }}</td>
+            <td><a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a></td>
+            <td><a href="{{ path('show_idea', {'entity': idea.id}) }}">anzeigen</a></td>
+            <td><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('comment_idea', {'entity': idea.id}) }}');">kommentieren</a></td>
+            <td><a href="{{ path('vote_for_idea', {'entity': idea.id}) }}">+1</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+{% endblock %}

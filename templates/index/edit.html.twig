@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="cell">
+    <a href="{{ path('ideas_index') }}">Zurück zur Übersicht</a>
+</div>
+<div class="cell">
+    {{ form(form) }}
+</div>
+{% endblock %}

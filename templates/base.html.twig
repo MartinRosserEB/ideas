@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js" lang="de">
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}Ideensammlung{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div class="grid-x grid-padding-x grid-padding-y">
+            {% block body %}{% endblock %}
+        </div>
+        <div class="reveal" id="modal" data-reveal></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"></script>
+        <script>
+        $(document).foundation();
+        
+        function loadFromUrlOpenModal(url) {
+            $.get(url, function(data) {
+                var modal = $("#modal");
+                modal.html(data);
+                modal.foundation('open');
+                $("#modalForm").submit(function(e) {
+                    var form = $(this);
+                    var url = form.attr('action');
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: form.serialize(),
+                        success: function(data) {
+                            $("#modal").foundation('close');
+                        }
+                    });
+                    e.preventDefault();
+                });
+            });
+        }
+        </script>
         {% block javascripts %}{% endblock %}
     </body>
 </html>

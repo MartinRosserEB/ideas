@@ -1,0 +1,25 @@
+{% block body %}
+<div class="cell">
+    <a href="{{ path('ideas_index') }}">Zurück zur Übersicht</a>
+</div>
+<div class="cell">
+    <p>Kommentar zur Idee <i>{{ idea }}</i> eingeben.</p>
+    {% if idea.comments|length > 0 %}
+    <p>Vorherige Kommentare:</p>
+    <table>
+    {% for comment in idea.comments %}
+        <tr>
+            <td>{{ comment.comment }}</td>
+            <td>{{ comment.datetime|date('d.m.Y') }} {{ comment.creator }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    {% endif %}
+</div>
+
+<div class="cell">
+    {{ form_start(form, {'action': path('comment_idea', {'entity': idea.id}), 'attr': {'id': 'modalForm'}}) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
+</div>
+{% endblock %}

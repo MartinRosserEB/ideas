@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="cell">
+    <a href="{{ path('ideas_index') }}">Zurück zur Übersicht</a>
+</div>
+
+<div class="cell">
+    <table>
+        <thead>
+            <tr>
+                <th>Titel</th>
+                <th>Beschrieb</th>
+                <th>Kommentare</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entity in entities %}
+            <tr>
+                <td>{{ entity.title }}</td>
+                <td>{{ entity.description }}</td>
+                <td>
+                    {% for comment in entity.comments %}
+                    <p>{{ comment }}</p>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
