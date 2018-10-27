@@ -1,32 +1,21 @@
-{% extends 'base.html.twig' %}
-
 {% block body %}
+<div class="cell"><h2>Idee <i>{{ entities[0].title }}</i> von {{ entities[0].creator}}</h2></div>
 <div class="cell">
-    <a href="{{ path('ideas_index') }}">Zurück zur Übersicht</a>
+    <div class="grid-x grid-padding-x">
+        {% for entity in entities %}
+            <div class="cell small-9 medium-3 large-2"><strong>{{ entity.title }}</strong></div>
+            <div class="cell small-3 medium-2 large-2">{{ entity.datetime|date('d.m.Y H:i') }}</div>
+            <div class="cell small-12 medium-3 large-4"><p>{{ entity.description }}</p></div>
+            <div class="cell small-12 medium-3 large-3">
+                {% if entity.comments|length > 0 %}<strong>Kommentare:</strong><br />{% endif %}
+                {% for comment in entity.comments %}
+                    <p>{{ comment.comment }}<br /><i>{{ comment.creator }}, {{ comment.datetime|date('d.m.Y H:i') }}</i></p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
 </div>
-
-<div class="cell">
-    <table>
-        <thead>
-            <tr>
-                <th>Titel</th>
-                <th>Beschrieb</th>
-                <th>Kommentare</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entity in entities %}
-            <tr>
-                <td>{{ entity.title }}</td>
-                <td>{{ entity.description }}</td>
-                <td>
-                    {% for comment in entity.comments %}
-                    <p>{{ comment }}</p>
-                    {% endfor %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<button class="close-button" data-close aria-label="Close modal" type="button">
+    <span aria-hidden="true">&times;</span>
+</button>
 {% endblock %}

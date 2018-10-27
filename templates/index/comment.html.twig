@@ -1,20 +1,6 @@
 {% block body %}
 <div class="cell">
-    <a href="{{ path('ideas_index') }}">Zurück zur Übersicht</a>
-</div>
-<div class="cell">
     <p>Kommentar zur Idee <i>{{ idea }}</i> eingeben.</p>
-    {% if idea.comments|length > 0 %}
-    <p>Vorherige Kommentare:</p>
-    <table>
-    {% for comment in idea.comments %}
-        <tr>
-            <td>{{ comment.comment }}</td>
-            <td>{{ comment.datetime|date('d.m.Y') }} {{ comment.creator }}</td>
-        </tr>
-    {% endfor %}
-    </table>
-    {% endif %}
 </div>
 
 <div class="cell">
@@ -22,4 +8,22 @@
     {{ form_widget(form) }}
     {{ form_end(form) }}
 </div>
+
+{% if idea.comments|length > 0 %}
+<div class="cell">
+    <p>Vorherige Kommentare:</p>
+</div>
+<div class="cell">
+    <div class="grid-x grid-padding-x">
+    {% for comment in idea.comments %}
+        <div class="cell small-12 medium-8">{{ comment.comment }}</div>
+        <div class="cell small-12 medium-4"><i>{{ comment.datetime|date('d.m.Y H:i') }} {{ comment.creator }}</i></div>
+    {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<button class="close-button" data-close aria-label="Close modal" type="button">
+    <span aria-hidden="true">&times;</span>
+</button>
 {% endblock %}

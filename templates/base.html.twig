@@ -4,13 +4,14 @@
         <meta charset="UTF-8">
         <title>{% block title %}Ideensammlung{% endblock %}</title>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
+        <style>textarea { min-height: 15rem; }</style>
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
         <div class="grid-x grid-padding-x grid-padding-y">
             {% block body %}{% endblock %}
         </div>
-        <div class="reveal" id="modal" data-reveal></div>
+        <div class="reveal large" id="modal" data-reveal></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"></script>
         <script>
