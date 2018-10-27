@@ -57,9 +57,15 @@ class Idea {
      */
     private $comments;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Vote", mappedBy="idea")
+     */
+    private $votes;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->votes = new ArrayCollection();
     }
 
     public function getId(): int
@@ -120,6 +126,20 @@ class Idea {
     public function getComments()
     {
         return $this->comments;
+    }
+
+    public function getVotes()
+    {
+        return $this->votes;
+    }
+
+    public function getVotesForUser(User $user)
+    {
+        return $this->votes->filter(
+            function ($vote) use ($user) {
+                return $vote->getVoter() === $user;
+            }
+        );
     }
 
     public function __toString()

@@ -9,6 +9,7 @@ use App\Entity\Vote;
 use App\Form\CommentType;
 use App\Form\IdeaType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -61,19 +62,27 @@ class IdeaController extends AbstractController
      */
     public function voteFor(Idea $entity, ValidatorInterface $validator)
     {
-        $vote = new Vote();
-        $vote->setDatetime(new \DateTime('now'));
-        $vote->setValue(1);
-        $vote->setVoter($this->getUser());
-        $vote->setIdea($entity);
-        $errors = $validator->validate($vote);
-        if (count($errors) == 0) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($vote);
+        $em = $this->getDoctrine()->getManager();
+        $existingVote = $em->getRepository(Vote::class)->findOneBy([
+            'voter' => $this->getUser(),
+            'idea' => $entity,
+        ]);
+        if ($existingVote) {
+            $em->remove($existingVote);
             $em->flush();
+        } else {
+            $vote = new Vote();
+            $vote->setDatetime(new \DateTime('now'))->setValue(1)->setVoter($this->getUser())->setIdea($entity);
+            $errors = $validator->validate($vote);
+            if (count($errors) == 0) {
+                $em->persist($vote);
+                $em->flush();
+            } else {
+                return new JsonResponse(['success' => false]);
+            }
         }
 
-        return $this->redirectToRoute('ideas_index');
+        return new JsonResponse(['success' => true]);
     }
 
     /**

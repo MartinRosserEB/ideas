@@ -27,7 +27,7 @@ class Vote {
     private $voter;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Idea")
+     * @ORM\ManyToOne(targetEntity="Idea", inversedBy="votes")
      */
     private $idea;
 
@@ -48,9 +48,11 @@ class Vote {
         return $this->id;
     }
 
-    public function setVoter(User $voter) : void
+    public function setVoter(User $voter) : Vote
     {
         $this->voter = $voter;
+
+        return $this;
     }
 
     public function getVoter()
@@ -58,9 +60,11 @@ class Vote {
         return $this->voter;
     }
 
-    public function setIdea(Idea $idea) : void
+    public function setIdea(Idea $idea) : Vote
     {
         $this->idea = $idea;
+
+        return $this;
     }
 
     public function getIdea()
@@ -68,7 +72,7 @@ class Vote {
         return $this->idea;
     }
 
-    public function setValue(int $value): void
+    public function setValue(int $value): Vote
     {
         if ($value > 0) {
             $this->value = 1;
@@ -77,6 +81,8 @@ class Vote {
         } else {
             $this->value = 0;
         }
+
+        return $this;
     }
 
     public function getValue()
@@ -84,9 +90,11 @@ class Vote {
         return $this->value;
     }
 
-    public function setDatetime(\DateTime $datetime)
+    public function setDatetime(\DateTime $datetime) : Vote
     {
         $this->datetime = $datetime;
+
+        return $this;
     }
 
     public function getDatetime()
