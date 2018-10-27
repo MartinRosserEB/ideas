@@ -7,11 +7,11 @@
 <div class="cell">
     <div class="grid-x grid-padding-x grid-padding-y">
     {% for idea in ideas %}
-        <div class="cell small-12 medium-3 large-2"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen"><strong>{{ idea.title }}</strong></a></div>
-        <div class="cell small-12 medium-4 large-7">{{ idea.description }}</div>
-        <div class="cell small-4 medium-2 large-1"><a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a></div>
-        <div class="cell small-4 medium-2 large-1"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('comment_idea', {'entity': idea.id}) }}');">kommentieren</a></div>
-        <div class="cell small-4 medium-1 large-1">{% if settings.votingActive|default(false) %}<td><a href="{{ path('vote_for_idea', {'entity': idea.id}) }}">+1</a>{% else %}&nbsp;{% endif %}</div>
+        <div class="cell small-12 large-2"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen"><strong>{{ idea.title }}</strong></a></div>
+        <div class="cell small-12 large-7">{{ idea.description }}</div>
+        <div class="cell small-4 large-1"><a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a></div>
+        <div class="cell small-4 large-1"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('comment_idea', {'entity': idea.id}) }}');">kommentieren</a></div>
+        <div class="cell small-4 large-1">{% if settings.votingActive|default(false) %}<td><a href="{{ path('vote_for_idea', {'entity': idea.id}) }}">+1</a>{% else %}&nbsp;{% endif %}</div>
         <div class="cell">&nbsp;</div>
     {% endfor %}
     </div>
