@@ -14,7 +14,7 @@
             </div>
             <div class="cell small-12 large-2">{% if entity.votes|length > 0%}
                 <strong>Stimmen:</strong><br />
-                {% for vote in entity.votes %}{{ vote.voter }}{% endfor %}
+                {% for vote in entity.votes %}{{ vote.voter }}{% if not loop.last %}, {% endif %}{% endfor %}
             {% endif %}</div>
         {% endfor %}
     </div>
