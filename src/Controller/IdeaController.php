@@ -38,16 +38,13 @@ class IdeaController extends AbstractController
      */
     public function edit(Request $request, Idea $entity)
     {
-        $newEntity = clone $entity; // detach before edit for versioning
-        $form = $this->createForm(IdeaType::class, $newEntity);
+        $form = $this->createForm(IdeaType::class, $entity);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $newEntity->setDatetime(new \DateTime('now'));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($newEntity);
-            $em->flush();
+            $entity->setDatetime(new \DateTime('now'));
+            $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute("ideas_index");
         }
@@ -128,6 +125,7 @@ class IdeaController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $idea->setIdeaId($em->getRepository(Idea::class)->findNextAvailableIdeaId());
             $idea->setCreator($this->getUser());
+            $idea->setDatetime(new \DateTime('now'));
             $em->persist($idea);
             $em->flush();
 

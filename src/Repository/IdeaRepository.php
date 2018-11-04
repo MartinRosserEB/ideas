@@ -15,22 +15,15 @@ class IdeaRepository extends ServiceEntityRepository
 
     public function findLatestDistinctIdeas()
     {
-        $ideasOrdered = $this->createQueryBuilder('i')
+        return $this->createQueryBuilder('i')
+            ->addSelect('COUNT(iv.id) AS HIDDEN voteCount')
+            ->leftJoin('i.votes', 'iv')
+            ->groupBy('i.ideaId')
+            ->addOrderBy('voteCount', 'DESC')
             ->addOrderBy('i.ideaId', 'ASC')
-            ->orderBy('i.datetime', 'DESC')
+            ->addOrderBy('i.datetime', 'DESC')
             ->getQuery()
             ->execute();
-
-        $distinctIdeas = [];
-        $distinctIdeasIdeaIds = [];
-        foreach ($ideasOrdered as $idea) {
-            if (!in_array($idea->getIdeaId(), $distinctIdeasIdeaIds)) {
-                $distinctIdeas[] = $idea;
-                $distinctIdeasIdeaIds[] = $idea->getIdeaId();
-            }
-        }
-
-        return $distinctIdeas;
     }
 
     public function findNextAvailableIdeaId()
