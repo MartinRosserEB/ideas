@@ -16,9 +16,9 @@ class IdeaRepository extends ServiceEntityRepository
     public function findLatestDistinctIdeas()
     {
         return $this->createQueryBuilder('i')
-            ->addSelect('COUNT(iv.id) AS HIDDEN voteCount')
+            ->addSelect('COUNT(i.id) AS HIDDEN voteCount')
             ->leftJoin('i.votes', 'iv')
-            ->groupBy('i.ideaId')
+            ->groupBy('i.id')
             ->addOrderBy('voteCount', 'DESC')
             ->addOrderBy('i.ideaId', 'ASC')
             ->addOrderBy('i.datetime', 'DESC')
