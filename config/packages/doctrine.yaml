@@ -7,12 +7,7 @@ parameters:
 
 doctrine:
     dbal:
-        # configure these for your database server
-        dbname: ideas
-        host: localhost
-        port: 3306
-        user: ideas
-        password: 0pMig8tK9uqWdNLD
+        url: '%env(DATABASE_URL)%'
         driver: 'pdo_mysql'
         server_version: '5.7'
         charset: utf8mb4
