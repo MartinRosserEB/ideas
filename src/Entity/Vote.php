@@ -22,7 +22,7 @@ class Vote {
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\ManyToOne(targetEntity="UserCollection")
      */
     private $voter;
 

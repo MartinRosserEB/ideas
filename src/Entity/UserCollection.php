@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity()
@@ -96,6 +95,23 @@ class UserCollection
         $this->role = $role;
 
         return $this;
+    }
+
+    public function __toString() {
+        $name = '';
+        if ($this->firstName) {
+            $name .= $this->firstName;
+        }
+        if ($this->familyName) {
+            if ($name !== '') {
+                $name .= ' ';
+            }
+            $name .= $this->familyName;
+        }
+        if ($name === '') {
+            $name = $this->getUser();
+        }
+        return $name;
     }
 
     public function getId(): int
