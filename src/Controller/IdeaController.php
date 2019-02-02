@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\AdminSettings;
+use App\Entity\Collection;
 use App\Entity\Comment;
 use App\Entity\Idea;
 use App\Entity\Vote;
@@ -17,27 +17,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class IdeaController extends AbstractController
 {
     /**
-     * @Route("/", name="ideas_index")
-     */
-    public function index()
-    {
-        $em = $this->getDoctrine()->getManager();
-        $adminSettings = $em->getRepository(AdminSettings::class)->findOneById(1);
-        if (!$adminSettings) {
-            $adminSettings = new AdminSettings();
-        }
-
-        return $this->render('index/index.html.twig', [
-            'ideas' => $em->getRepository(Idea::class)->findLatestDistinctIdeas(),
-            'settings' => $adminSettings,
-        ]);
-    }
-
-    /**
      * @Route("/edit/{entity}", name="edit_idea")
      */
     public function edit(Request $request, Idea $entity)
     {
+        $collection = $entity->getCollection();
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1) {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $form = $this->createForm(IdeaType::class, $entity);
 
         $form->handleRequest($request);
@@ -46,11 +37,14 @@ class IdeaController extends AbstractController
             $entity->setDatetime(new \DateTime('now'));
             $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute("ideas_index");
+            return $this->redirectToRoute("collection_index", [
+                "entity" => $collection->getId(),
+            ]);
         }
 
-        return $this->render('index/new.html.twig', [
+        return $this->render('ideas/edit.html.twig', [
             'form' => $form->createView(),
+            'collection' => $collection,
         ]);
     }
 
@@ -59,6 +53,14 @@ class IdeaController extends AbstractController
      */
     public function voteFor(Idea $entity, ValidatorInterface $validator)
     {
+        $collection = $entity->getCollection();
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1) {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $existingVote = $em->getRepository(Vote::class)->findOneBy([
             'voter' => $this->getUser(),
@@ -87,6 +89,14 @@ class IdeaController extends AbstractController
      */
     public function comment(Request $request, ValidatorInterface $validator, Idea $entity)
     {
+        $collection = $entity->getCollection();
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1) {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $comment = new Comment();
         $comment->setCreator($this->getUser());
         $comment->setIdea($entity);
@@ -101,20 +111,29 @@ class IdeaController extends AbstractController
             $em->persist($comment);
             $em->flush();
 
-            return $this->redirectToRoute("ideas_index");
+            return $this->redirectToRoute('collection_index', [
+                'entity' => $collection->getId()
+            ]);
         }
 
-        return $this->render('index/comment.html.twig', [
+        return $this->render('ideas/comment.html.twig', [
             'form' => $form->createView(),
             'idea' => $entity,
         ]);
     }
 
     /**
-     * @Route("/create", name="create_idea")
+     * @Route("/create/{collection}", name="create_idea")
      */
-    public function create(Request $request)
+    public function create(Request $request, Collection $collection)
     {
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1) {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $idea = new Idea();
         $form = $this->createForm(IdeaType::class, $idea);
 
@@ -122,6 +141,7 @@ class IdeaController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $idea = $form->getData();
+            $idea->setCollection($collection);
             $em = $this->getDoctrine()->getManager();
             $idea->setIdeaId($em->getRepository(Idea::class)->findNextAvailableIdeaId());
             $idea->setCreator($this->getUser());
@@ -129,11 +149,14 @@ class IdeaController extends AbstractController
             $em->persist($idea);
             $em->flush();
 
-            return $this->redirectToRoute("ideas_index");
+            return $this->redirectToRoute("collection_index", [
+                'entity' => $collection->getId(),
+            ]);
         }
 
-        return $this->render('index/new.html.twig', [
+        return $this->render('ideas/new.html.twig', [
             'form' => $form->createView(),
+            'collection' => $collection,
         ]);
     }
 
@@ -144,7 +167,7 @@ class IdeaController extends AbstractController
     {
         $entities = $this->getDoctrine()->getManager()->getRepository(Idea::class)->findAllForIdeaId($entity->getIdeaId());
 
-        return $this->render('index/show.html.twig', [
+        return $this->render('ideas/show.html.twig', [
             'entities' => $entities,
         ]);
     }

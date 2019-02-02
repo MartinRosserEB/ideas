@@ -2,7 +2,7 @@
 
 {% block body %}
 <div class="cell">
-    <a href="{{ path('ideas_index') }}">Zurück zur Ideenübersicht</a> | <a href="{{ path('create_user') }}">Benutzer erstellen</a> | <a href="{{ path('edit_admin_settings') }}">Einstellungen bearbeiten (E-Mailvorlage etc.)</a> | <a href="{{ path('send_mail') }}">Mail an alle Benutzer versenden</a>
+    <a href="{{ path('collection_index', {'entity': collection.id}) }}">Zurück zur Ideenübersicht</a> | <a href="{{ path('create_user', {'collection': collection.id}) }}">Benutzer erstellen</a> | <a href="{{ path('edit_admin_settings', {'collection': collection.id}) }}">Einstellungen bearbeiten (E-Mailvorlage etc.)</a> | <a href="{{ path('send_mail', {'collection': collection.id}) }}">Mail an alle Benutzer versenden</a>
 </div>
 
 <div class="cell">
@@ -12,18 +12,20 @@
                 <th>Vorname</th>
                 <th>Nachname</th>
                 <th>E-Mail</th>
+                <th>Rolle</th>
                 <th>Login-URL</th>
                 <th>Aktion</th>
             </tr>
         </thead>
         <tbody>
-        {% for user in users %}
+        {% for collectionUser in collectionUsers %}
             <tr>
-                <td>{{ user.firstName }}</td>
-                <td>{{ user.familyName }}</td>
-                <td>{{ user.email }}</td>
-                <td><a href="{{ app.request.getSchemeAndHttpHost() }}?u={{ user.apiToken }}">{{ app.request.getSchemeAndHttpHost() }}?u={{ user.apiToken }}</a></td>
-                <td><a href="{{ path('edit_user', {'user': user.id}) }}">bearbeiten</a></td>
+                <td>{{ collectionUser.firstName }}</td>
+                <td>{{ collectionUser.familyName }}</td>
+                <td>{{ collectionUser.user.email }}</td>
+                <td>{{ collectionUser.role }}</td>
+                <td><a href="{{ app.request.getSchemeAndHttpHost() }}?u={{ collectionUser.user.apiToken }}">{{ app.request.getSchemeAndHttpHost() }}?u={{ collectionUser.user.apiToken }}</a></td>
+                <td><a href="{{ path('edit_user', {'userCollection': collectionUser.id}) }}">bearbeiten</a></td>
             </tr>
         {% endfor %}
         </tbody>

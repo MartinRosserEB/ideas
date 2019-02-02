@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -22,20 +23,12 @@ class User implements UserInterface
      */
     private $email;
 
-    /**
-     * @ORM\Column(type="string", length=180)
-     */
-    private $firstName;
+    
 
     /**
-     * @ORM\Column(type="string", length=180)
+     * @ORM\OneToMany(targetEntity="UserCollection", mappedBy="user")
      */
-    private $familyName;
-
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
+    private $userCollections;
 
     /**
      * @var string The hashed password
@@ -48,7 +41,12 @@ class User implements UserInterface
      */
     private $apiToken;
 
-    public function getId(): ?int
+    public function __construct()
+    {
+        $this->userCollections = new ArrayCollection();
+    }
+
+    public function getId(): int
     {
         return $this->id;
     }
@@ -65,26 +63,6 @@ class User implements UserInterface
         return $this;
     }
 
-    public function setFirstName($firstName)
-    {
-        $this->firstName = $firstName;
-    }
-
-    public function getFirstName()
-    {
-        return $this->firstName;
-    }
-
-    public function setFamilyName($familyName)
-    {
-        $this->familyName = $familyName;
-    }
-
-    public function getFamilyName()
-    {
-        return $this->familyName;
-    }
-
     /**
      * A visual identifier that represents this user.
      *
@@ -92,30 +70,30 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        if ($this->firstName && $this->familyName) {
-            return $this->firstName.' '.$this->familyName;
-        } else {
-            return (string) $this->email;
-        }
+        return (string) $this->email;
     }
 
     /**
      * @see UserInterface
      */
-    public function getRoles(): array
+    public function getRoles()
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return ['ROLE_USER'];
     }
 
-    public function setRoles(array $roles): self
+    public function getUserCollections()
     {
-        $this->roles = $roles;
+        return $this->userCollections;
+    }
 
-        return $this;
+    public function addUserCollection(UserCollection $userCollection)
+    {
+        $this->userCollections->add($userCollection);
+    }
+
+    public function removeUserCollection(UserCollection $userCollection)
+    {
+        $this->userCollections->remove($userCollection);
     }
 
     /**

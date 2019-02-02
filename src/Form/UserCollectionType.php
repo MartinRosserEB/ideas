@@ -2,7 +2,8 @@
 
 namespace App\Form;
 
-use App\Entity\User;
+use App\Entity\UserCollection;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -12,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @author mrosser
  */
-class UserType extends AbstractType
+class UserCollectionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -25,6 +26,14 @@ class UserType extends AbstractType
             ])
             ->add('email', TextType::class, [
                 'label' => 'E-Mail',
+                'mapped' => false,
+            ])
+            ->add('role', ChoiceType::class, [
+                'label' => 'Rolle',
+                'choices' => [
+                    'Anwender' => 'Anwender',
+                    'Administrator' => 'Admin',
+                ]
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Speichern'
@@ -35,7 +44,7 @@ class UserType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => User::class,
+            'data_class' => UserCollection::class,
         ));
     }
 }

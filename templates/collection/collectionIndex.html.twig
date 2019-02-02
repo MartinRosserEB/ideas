@@ -2,11 +2,11 @@
 
 {% block body %}
 <div class="cell">
-    {% if not settings.votingActive|default(false) %}<a href="{{ path('create_idea') }}">Neue Idee erfassen</a>{% endif %}{% if is_granted('ROLE_ADMIN') %} | <a href="{{ path('show_users') }}">Administration</a>{% endif %}
+    <a href="{{ path('create_collection') }}">Neue Ideensammlung starten</a> | {% if not collection.adminSettings.votingActive|default(false) %}<a href="{{ path('create_idea', {'collection': collection.id}) }}">Neue Idee erfassen</a>{% endif %}{% if admin %} | <a href="{{ path('show_users', {'collection': collection.id}) }}">Administration</a>{% endif %}
 </div>
 <div class="cell">
     <div class="grid-x grid-padding-x grid-padding-y">
-    {% for idea in ideas %}
+    {% for idea in collection.ideas %}
         <div class="cell small-12 large-2"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen"><strong>{{ idea.title }}</strong></a>{% if settings.votingActive|default(false) %} ({{ idea.votes|length }} Stimme/n){% endif %}</div>
         <div class="cell small-12 large-7">{{ idea.description }}</div>
         <div class="cell small-4 large-1">{% if not settings.votingActive|default(false) %}<a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a>{% endif %}</div>
@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block javascripts %}
-{% if settings.votingActive|default(false) %}
+{% if collection.adminSettings.votingActive|default(false) %}
 <script>
 $(document).ready(function() {
     $('input[type="checkbox"]').on('change', function() {

@@ -34,6 +34,11 @@ class Idea {
     private $ideaId;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Collection", inversedBy="ideas")
+     */
+    private $collection;
+
+    /**
      * @var string
      * @Assert\NotBlank()
      * @ORM\Column(type="string")
@@ -91,6 +96,16 @@ class Idea {
     public function getIdeaId()
     {
         return $this->ideaId;
+    }
+
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
+    public function setCollection(Collection $collection)
+    {
+        $this->collection = $collection;
     }
 
     public function setTitle(string $title): void

@@ -20,16 +20,21 @@ class AdminSettings {
     private $id;
 
     /**
+     * @ORM\OneToOne(targetEntity="Collection", inversedBy="adminSettings")
+     */
+    private $collection;
+
+    /**
      * @var string
      *
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $mailText;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $mailSubject;
 
@@ -43,6 +48,18 @@ class AdminSettings {
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
+    public function setCollection(Collection $collection)
+    {
+        $this->collection = $collection;
+
+        return $this;
     }
 
     public function setMailText($mailText)
@@ -68,6 +85,8 @@ class AdminSettings {
     public function setVotingActive($votingActive)
     {
         $this->votingActive = $votingActive;
+
+        return $this;
     }
 
     public function getVotingActive()

@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\AdminSettings;
+use App\Entity\Collection;
 use App\Entity\User;
+use App\Entity\UserCollection;
 use App\Form\AdminSettingsType;
-use App\Form\UserType;
+use App\Form\UserCollectionType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,28 +19,45 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class AdminController extends AbstractController
 {
     /**
-     * @Route("users/show/", name="show_users")
+     * @Route("users/show/{collection}", name="show_users")
      */
-    public function showUsers()
+    public function showUsers(Collection $collection)
     {
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $em = $this->getDoctrine()->getManager();
 
         return $this->render('admin/users.html.twig', [
-            'users' => $em->getRepository(User::class)->findAll(),
+            'collectionUsers' => $collection->getCollectionUsers(),
+            'collection' => $collection,
         ]);
     }
 
     /**
-     * @Route("user/edit/{user}", name="edit_user")
+     * @Route("user/edit/{userCollection}", name="edit_user")
      */
-    public function editUser(Request $request, User $user)
+    public function editUser(Request $request, UserCollection $userCollection)
     {
-        $form = $this->createForm(UserType::class, $user);
+        $collection = $userCollection->getCollection();
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1  || $userCollections->first()->getRole() !== 'Admin') {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $form = $this->createForm(UserCollectionType::class, $userCollection);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $form->getData();
+            $userCollection = $form->getData();
+            $userCollection->getUser()->setEmail($form->get("email")->getData());
             $em = $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute("show_users");
@@ -46,48 +65,71 @@ class AdminController extends AbstractController
 
         return $this->render('admin/edit.html.twig', [
             'form' => $form->createView(),
+            'collection' => $collection,
         ]);
     }
 
     /**
-     * @Route("user/create", name="create_user")
+     * @Route("user/create/{collection}", name="create_user")
      */
-    public function createUser(Request $request)
+    public function createUser(Request $request, Collection $collection)
     {
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $userCollection = new UserCollection();
+        $form = $this->createForm(UserCollectionType::class, $userCollection);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $form->getData();
+            $userCollection = $form->getData();
+            $userCollection->setCollection($collection);
             $em = $this->getDoctrine()->getManager();
-            $user->setRoles(['role' => 'ROLE_USER']);
+            $email = $form->get('email')->getData();
+            $user = $em->getRepository(User::class)->findOneByEmail($email);
+            if (!$user) {
+                $user = new User();
+                $user->setEmail($email);
+            }
             $now = new \DateTime('now');
             $hash = md5('prefix'.$now->format('Y-m-d H:i:s').'suffix');
             $user->setApiToken($hash);
             $user->setPassword($hash);
+            $userCollection->setUser($user);
             $em->persist($user);
+            $em->persist($userCollection);
             $em->flush();
 
-            return $this->redirectToRoute("show_users");
+            return $this->redirectToRoute("show_users", [
+                'collection' => $collection->getId(),
+            ]);
         }
 
         return $this->render('admin/new.html.twig', [
             'form' => $form->createView(),
+            'collection' => $collection,
         ]);
     }
 
     /**
-     * @Route("settings/edit", name="edit_admin_settings")
+     * @Route("settings/edit/{collection}", name="edit_admin_settings")
      */
-    public function editAdminSettings(Request $request)
+    public function editAdminSettings(Request $request, Collection $collection)
     {
-        $em = $this->getDoctrine()->getManager();
-        $adminSettings = $em->getRepository(AdminSettings::class)->findOneById(1);
-        if (!$adminSettings) {
-            $adminSettings = new AdminSettings();
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+            return $this->redirectToRoute('collections_index');
         }
+
+        $em = $this->getDoctrine()->getManager();
+        $adminSettings = $collection->getAdminSettings();
         $form = $this->createForm(AdminSettingsType::class, $adminSettings);
 
         $form->handleRequest($request);
@@ -97,19 +139,29 @@ class AdminController extends AbstractController
             $em->persist($adminSettings);
             $em->flush();
 
-            return $this->redirectToRoute("show_users");
+            return $this->redirectToRoute('show_users', [
+                'collection' => $collection->getId(),
+            ]);
         }
 
         return $this->render('admin/settings.html.twig', [
             'form' => $form->createView(),
+            'collection' => $collection,
         ]);
     }
 
     /**
-     * @Route("send/mail", name="send_mail")
+     * @Route("send/mail/{collection}", name="send_mail")
      */
-    public function sendMail(\Swift_Mailer $mailer)
+    public function sendMail(\Swift_Mailer $mailer, Collection $collection)
     {
+        $userCollections = $this->getUser()->getUserCollections()->filter(
+            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
+        );
+        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+            return $this->redirectToRoute('collections_index');
+        }
+
         $em = $this->getDoctrine()->getManager();
         $adminSettings = $em->getRepository(AdminSettings::class)->findOneById(1);
         if (!$adminSettings || !$adminSettings->getMailText() || !$adminSettings->getMailSubject()) {
