@@ -7,6 +7,7 @@ use App\Entity\Collection;
 use App\Entity\Idea;
 use App\Entity\UserCollection;
 use App\Form\CollectionType;
+use App\Service\Access;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -33,19 +34,16 @@ class CollectionController extends AbstractController
     /**
      * @Route("/collection/{entity}", name="collection_index")
      */
-    public function collectionIndex(Collection $entity)
+    public function collectionIndex(Collection $entity, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($entity) { return $entry->getCollection() === $entity; }
-        );
-        if (count($userCollections) != 1) {
+        if (!$accessSrv->checkAccess($this->getUser(), $entity)) {
             return $this->redirectToRoute('collections_index');
         }
 
         return $this->render('collection/collectionIndex.html.twig', [
             'collection' => $entity,
             'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
-            'admin' => $userCollections->first()->getRole() === 'Admin'
+            'admin' => $accessSrv->checkAccess($this->getUser(), $entity, true),
         ]);
     }
 

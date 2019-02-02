@@ -8,6 +8,7 @@ use App\Entity\Idea;
 use App\Entity\Vote;
 use App\Form\CommentType;
 use App\Form\IdeaType;
+use App\Service\Access;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,13 +20,10 @@ class IdeaController extends AbstractController
     /**
      * @Route("/edit/{entity}", name="edit_idea")
      */
-    public function edit(Request $request, Idea $entity)
+    public function edit(Request $request, Idea $entity, Access $accessSrv)
     {
         $collection = $entity->getCollection();
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1) {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -51,13 +49,10 @@ class IdeaController extends AbstractController
     /**
      * @Route("/voteFor/{entity}", name="vote_for_idea")
      */
-    public function voteFor(Idea $entity, ValidatorInterface $validator)
+    public function voteFor(Idea $entity, ValidatorInterface $validator, Access $accessSrv)
     {
         $collection = $entity->getCollection();
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1) {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -87,13 +82,10 @@ class IdeaController extends AbstractController
     /**
      * @Route("/comment/{entity}", name="comment_idea")
      */
-    public function comment(Request $request, ValidatorInterface $validator, Idea $entity)
+    public function comment(Request $request, ValidatorInterface $validator, Idea $entity, Access $accessSrv)
     {
         $collection = $entity->getCollection();
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1) {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -125,12 +117,9 @@ class IdeaController extends AbstractController
     /**
      * @Route("/create/{collection}", name="create_idea")
      */
-    public function create(Request $request, Collection $collection)
+    public function create(Request $request, Collection $collection, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1) {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -163,8 +152,11 @@ class IdeaController extends AbstractController
     /**
      * @Route("/show/{entity}", name="show_idea")
      */
-    public function show(Idea $entity)
+    public function show(Idea $entity, Access $accessSrv)
     {
+        if (!$accessSrv->checkAccess($this->getUser(), $entity->getCollection())) {
+            return $this->redirectToRoute('collections_index');
+        }
         $entities = $this->getDoctrine()->getManager()->getRepository(Idea::class)->findAllForIdeaId($entity->getIdeaId());
 
         return $this->render('ideas/show.html.twig', [

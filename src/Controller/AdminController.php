@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\UserCollection;
 use App\Form\AdminSettingsType;
 use App\Form\UserCollectionType;
+use App\Service\Access;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,12 +22,9 @@ class AdminController extends AbstractController
     /**
      * @Route("users/show/{collection}", name="show_users")
      */
-    public function showUsers(Collection $collection)
+    public function showUsers(Collection $collection, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -41,13 +39,10 @@ class AdminController extends AbstractController
     /**
      * @Route("user/edit/{userCollection}", name="edit_user")
      */
-    public function editUser(Request $request, UserCollection $userCollection)
+    public function editUser(Request $request, UserCollection $userCollection, Access $accessSrv)
     {
         $collection = $userCollection->getCollection();
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1  || $userCollections->first()->getRole() !== 'Admin') {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -72,12 +67,9 @@ class AdminController extends AbstractController
     /**
      * @Route("user/create/{collection}", name="create_user")
      */
-    public function createUser(Request $request, Collection $collection)
+    public function createUser(Request $request, Collection $collection, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -119,12 +111,9 @@ class AdminController extends AbstractController
     /**
      * @Route("settings/edit/{collection}", name="edit_admin_settings")
      */
-    public function editAdminSettings(Request $request, Collection $collection)
+    public function editAdminSettings(Request $request, Collection $collection, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -153,12 +142,9 @@ class AdminController extends AbstractController
     /**
      * @Route("send/mail/{collection}", name="send_mail")
      */
-    public function sendMail(\Swift_Mailer $mailer, Collection $collection)
+    public function sendMail(\Swift_Mailer $mailer, Collection $collection, Access $accessSrv)
     {
-        $userCollections = $this->getUser()->getUserCollections()->filter(
-            function ($entry) use ($collection) { return $entry->getCollection() === $collection; }
-        );
-        if (count($userCollections) != 1 || $userCollections->first()->getRole() !== 'Admin') {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
             return $this->redirectToRoute('collections_index');
         }
 
