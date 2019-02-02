@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Idea;
+use App\Entity\Collection;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -13,7 +14,7 @@ class IdeaRepository extends ServiceEntityRepository
         parent::__construct($registry, Idea::class);
     }
 
-    public function findLatestDistinctIdeas()
+    public function findLatestDistinctIdeas(Collection $collection)
     {
         return $this->createQueryBuilder('i')
             ->addSelect('COUNT(i.id) AS HIDDEN voteCount')
@@ -22,6 +23,8 @@ class IdeaRepository extends ServiceEntityRepository
             ->addOrderBy('voteCount', 'DESC')
             ->addOrderBy('i.ideaId', 'ASC')
             ->addOrderBy('i.datetime', 'DESC')
+            ->andWhere('i.collection = :collection')
+            ->setParameter(':collection', $collection)
             ->getQuery()
             ->execute();
     }

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\AdminSettings;
 use App\Entity\Collection;
+use App\Entity\Idea;
 use App\Entity\UserCollection;
 use App\Form\CollectionType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,6 +44,7 @@ class CollectionController extends AbstractController
 
         return $this->render('collection/collectionIndex.html.twig', [
             'collection' => $entity,
+            'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
             'admin' => $userCollections->first()->getRole() === 'Admin'
         ]);
     }
