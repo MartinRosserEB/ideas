@@ -151,7 +151,7 @@ class AdminController extends AbstractController
         }
 
         $em = $this->getDoctrine()->getManager();
-        $adminSettings = $em->getRepository(AdminSettings::class)->findOneById(1);
+        $adminSettings = $collection->getAdminSettings();
         if (!$adminSettings || !$adminSettings->getMailText() || !$adminSettings->getMailSubject()) {
             throw new \Exception('E-Mail text or subject not defined.');
         }
