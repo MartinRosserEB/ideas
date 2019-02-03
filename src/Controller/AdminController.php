@@ -163,8 +163,8 @@ class AdminController extends AbstractController
             $user = $collectionUser->getUser();
             $adaptedText = str_replace(
                 '%Link%', $this->generateUrl('collection_index', ['entity' => $collection->getId()], UrlGeneratorInterface::ABSOLUTE_URL).'?u='.$user->getApiToken(), str_replace(
-                    '%Nachname%', $user->getFamilyName(), str_replace(
-                        '%Vorname%', $user->getFirstName(), $mailText)));
+                    '%Nachname%', $collectionUser->getFamilyName(), str_replace(
+                        '%Vorname%', $collectionUser->getFirstName(), $mailText)));
             $message = (new \Swift_Message($mailSubject))
                 ->setFrom($this->getUser()->getEmail())
                 ->setTo($user->getEmail())
