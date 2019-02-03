@@ -52,7 +52,6 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $userCollection = $form->getData();
-            dump($form);
             $em = $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute("show_users", [
