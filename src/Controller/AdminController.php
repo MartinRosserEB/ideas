@@ -158,10 +158,11 @@ class AdminController extends AbstractController
         $mailText = $adminSettings->getMailText();
         $mailSubject = $adminSettings->getMailSubject();
 
-        $users = $em->getRepository(User::class)->findAll();
-        foreach ($users as $user) {
+        $collectionUsers = $collection->getCollectionUsers();
+        foreach ($collectionUsers as $collectionUser) {
+            $user = $collectionUser->getUser();
             $adaptedText = str_replace(
-                '%Link%', $this->generateUrl('ideas_index', [], UrlGeneratorInterface::ABSOLUTE_URL).'?u='.$user->getApiToken(), str_replace(
+                '%Link%', $this->generateUrl('collection_index', ['entity' => $collection->getId()], UrlGeneratorInterface::ABSOLUTE_URL).'?u='.$user->getApiToken(), str_replace(
                     '%Nachname%', $user->getFamilyName(), str_replace(
                         '%Vorname%', $user->getFirstName(), $mailText)));
             $message = (new \Swift_Message($mailSubject))
