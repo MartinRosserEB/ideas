@@ -55,7 +55,9 @@ class AdminController extends AbstractController
             $userCollection->getUser()->setEmail($form->get("email")->getData());
             $em = $this->getDoctrine()->getManager()->flush();
 
-            return $this->redirectToRoute("show_users");
+            return $this->redirectToRoute("show_users", [
+                'collection' => $collection->getId(),
+            ]);
         }
 
         return $this->render('admin/edit.html.twig', [
@@ -175,6 +177,8 @@ class AdminController extends AbstractController
             $mailer->send($message);
         }
 
-        return $this->redirectToRoute("show_users");
+        return $this->redirectToRoute("show_users", [
+            'collection' => $collection->getId(),
+        ]);
     }
 }
