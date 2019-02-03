@@ -52,7 +52,7 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $userCollection = $form->getData();
-            $userCollection->getUser()->setEmail($form->get("email")->getData());
+            dump($form);
             $em = $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute("show_users", [
@@ -84,17 +84,17 @@ class AdminController extends AbstractController
             $userCollection = $form->getData();
             $userCollection->setCollection($collection);
             $em = $this->getDoctrine()->getManager();
-            $email = $form->get('email')->getData();
-            $user = $em->getRepository(User::class)->findOneByEmail($email);
-            if (!$user) {
-                $user = new User();
-                $user->setEmail($email);
+            $user = $em->getRepository(User::class)->findOneByEmail($userCollection->getUser()->getEmail());
+            if ($user !== null) {
+                // user already exists. Reuse entry.
+                $userCollection->setUser($user);
+            } else {
+                $user = $userCollection->getUser();
+                $now = new \DateTime('now');
+                $hash = md5('prefix'.$now->format('Y-m-d H:i:s').'suffix');
+                $user->setApiToken($hash);
+                $user->setPassword($hash);
             }
-            $now = new \DateTime('now');
-            $hash = md5('prefix'.$now->format('Y-m-d H:i:s').'suffix');
-            $user->setApiToken($hash);
-            $user->setPassword($hash);
-            $userCollection->setUser($user);
             $em->persist($user);
             $em->persist($userCollection);
             $em->flush();

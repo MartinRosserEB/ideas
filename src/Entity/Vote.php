@@ -48,7 +48,7 @@ class Vote {
         return $this->id;
     }
 
-    public function setVoter(User $voter) : Vote
+    public function setVoter(UserCollection $voter) : Vote
     {
         $this->voter = $voter;
 

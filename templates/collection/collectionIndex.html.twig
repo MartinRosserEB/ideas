@@ -25,7 +25,9 @@ $(document).ready(function() {
     $('input[type="checkbox"]').on('change', function() {
         var url = "{{ path('vote_for_idea', {'entity': '__id__'}) }}";
         url = url.replace('__id__', $(this).attr('name'));
-        $.post(url);
+        $.post(url, function( data ) {
+            location.reload();
+        });
     });
 });
 </script>

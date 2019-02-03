@@ -13,12 +13,7 @@ class Access {
     {
         $accessGranted = false;
 
-        $userCollections = $user->getUserCollections()->filter(
-            function ($entry) use ($collection)
-            {
-                return $entry->getCollection() === $collection;
-            }
-        );
+        $userCollections = $this->getUserCollections($user, $collection);
 
         if (count($userCollections) == 1) {
              if ($checkAdmin === false) {
@@ -29,5 +24,15 @@ class Access {
         }
 
         return $accessGranted;
+    }
+
+    public function getUserCollections(User $user, Collection $collection)
+    {
+        return $user->getUserCollections()->filter(
+            function ($entry) use ($collection)
+            {
+                return $entry->getCollection() === $collection;
+            }
+        );
     }
 }

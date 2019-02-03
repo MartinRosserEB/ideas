@@ -51,14 +51,16 @@ class IdeaController extends AbstractController
      */
     public function voteFor(Idea $entity, ValidatorInterface $validator, Access $accessSrv)
     {
+        $user = $this->getUser();
         $collection = $entity->getCollection();
-        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
+        $userCollection = $accessSrv->getUserCollections($user, $collection)->first();
+        if (!$accessSrv->checkAccess($user, $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
         $em = $this->getDoctrine()->getManager();
         $existingVote = $em->getRepository(Vote::class)->findOneBy([
-            'voter' => $this->getUser(),
+            'voter' => $userCollection,
             'idea' => $entity,
         ]);
         if ($existingVote) {
@@ -66,7 +68,7 @@ class IdeaController extends AbstractController
             $em->flush();
         } else {
             $vote = new Vote();
-            $vote->setDatetime(new \DateTime('now'))->setValue(1)->setVoter($this->getUser())->setIdea($entity);
+            $vote->setDatetime(new \DateTime('now'))->setValue(1)->setVoter($userCollection)->setIdea($entity);
             $errors = $validator->validate($vote);
             if (count($errors) == 0) {
                 $em->persist($vote);
@@ -85,12 +87,13 @@ class IdeaController extends AbstractController
     public function comment(Request $request, ValidatorInterface $validator, Idea $entity, Access $accessSrv)
     {
         $collection = $entity->getCollection();
-        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
+        $user = $this->getUser();
+        if (!$accessSrv->checkAccess($user, $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
         $comment = new Comment();
-        $comment->setCreator($this->getUser());
+        $comment->setCreator($accessSrv->getUserCollections($user, $collection)->first());
         $comment->setIdea($entity);
         $form = $this->createForm(CommentType::class, $comment);
 
@@ -119,7 +122,8 @@ class IdeaController extends AbstractController
      */
     public function create(Request $request, Collection $collection, Access $accessSrv)
     {
-        if (!$accessSrv->checkAccess($this->getUser(), $collection)) {
+        $user = $this->getUser();
+        if (!$accessSrv->checkAccess($user, $collection)) {
             return $this->redirectToRoute('collections_index');
         }
 
@@ -133,7 +137,7 @@ class IdeaController extends AbstractController
             $idea->setCollection($collection);
             $em = $this->getDoctrine()->getManager();
             $idea->setIdeaId($em->getRepository(Idea::class)->findNextAvailableIdeaId());
-            $idea->setCreator($this->getUser());
+            $idea->setCreator($accessSrv->getUserCollections($user, $collection)->first());
             $idea->setDatetime(new \DateTime('now'));
             $em->persist($idea);
             $em->flush();

@@ -111,7 +111,7 @@ class UserCollection
         if ($name === '') {
             $name = $this->getUser();
         }
-        return $name;
+        return (string) $name;
     }
 
     public function getId(): int

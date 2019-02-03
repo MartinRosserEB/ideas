@@ -78,7 +78,7 @@ class Idea {
         return $this->id;
     }
 
-    public function setCreator(User $creator) : void
+    public function setCreator(UserCollection $creator) : void
     {
         $this->creator = $creator;
     }

@@ -24,10 +24,7 @@ class UserCollectionType extends AbstractType
             ->add('familyName', TextType::class, [
                 'label' => 'Nachname',
             ])
-            ->add('email', TextType::class, [
-                'label' => 'E-Mail',
-                'mapped' => false,
-            ])
+            ->add('user', UserType::class)
             ->add('role', ChoiceType::class, [
                 'label' => 'Rolle',
                 'choices' => [
