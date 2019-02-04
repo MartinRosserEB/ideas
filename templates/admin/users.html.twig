@@ -13,7 +13,6 @@
                 <th>Nachname</th>
                 <th>E-Mail</th>
                 <th>Rolle</th>
-                <th>Login-URL</th>
                 <th>Aktion</th>
             </tr>
         </thead>
@@ -24,7 +23,6 @@
                 <td>{{ collectionUser.familyName }}</td>
                 <td>{{ collectionUser.user.email }}</td>
                 <td>{{ collectionUser.role }}</td>
-                <td><a href="{{ app.request.getSchemeAndHttpHost() }}?u={{ collectionUser.user.apiToken }}">{{ app.request.getSchemeAndHttpHost() }}?u={{ collectionUser.user.apiToken }}</a></td>
                 <td><a href="{{ path('edit_user', {'userCollection': collectionUser.id}) }}">bearbeiten</a></td>
             </tr>
         {% endfor %}
