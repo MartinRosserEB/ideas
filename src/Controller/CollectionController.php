@@ -59,12 +59,16 @@ class CollectionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $collection = $form->getData();
+            $user = $this->getUser();
+            $existingUC = $user->getUserCollections()->first();
             $adminSettings = new AdminSettings();
             $adminSettings->setCollection($collection)
                 ->setVotingActive(false);
             $userCollection = new UserCollection();
             $userCollection->setCollection($collection)
-                ->setUser($this->getUser())
+                ->setUser($user)
+                ->setFirstName($existingUC->getFirstName())
+                ->setFamilyName($existingUC->getFamilyName())
                 ->setRole('Admin');
             $em = $this->getDoctrine()->getManager();
             $em->persist($collection);

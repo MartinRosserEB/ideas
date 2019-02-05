@@ -56,6 +56,8 @@ class UserCollection
     public function setFirstName($firstName)
     {
         $this->firstName = $firstName;
+
+        return $this;
     }
 
     public function getFirstName()
@@ -66,6 +68,8 @@ class UserCollection
     public function setFamilyName($familyName)
     {
         $this->familyName = $familyName;
+
+        return $this;
     }
 
     public function getFamilyName()
