@@ -59,6 +59,7 @@ class CollectionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $collection = $form->getData();
+            $collection->setDescription(nl2br($collection->getDescription()));
             $user = $this->getUser();
             $existingUC = $user->getUserCollections()->first();
             $adminSettings = new AdminSettings();

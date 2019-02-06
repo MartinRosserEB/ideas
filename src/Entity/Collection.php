@@ -23,6 +23,13 @@ class Collection
     private $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="text")
+     */
+    private $description;
+
+    /**
      * @ORM\OneToMany(targetEntity="UserCollection", mappedBy="collection")
      */
     private $collectionUsers;
@@ -56,6 +63,18 @@ class Collection
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
 
         return $this;
     }

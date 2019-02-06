@@ -5,6 +5,7 @@
     <a href="{{ path('create_collection') }}">Neue Ideensammlung starten</a>
     <h3>{{ collection.name }}</h3>
     {% if not collection.adminSettings.votingActive|default(false) %}<a href="{{ path('create_idea', {'collection': collection.id}) }}">Neue Idee erfassen</a>{% endif %}{% if admin %}&nbsp;&nbsp;&nbsp;<a href="{{ path('show_users', {'collection': collection.id}) }}">Administration</a>{% endif %}
+    <p>{{ collection.description|raw }}</p>
 </div>
 <div class="cell">
     <div class="grid-x grid-padding-x grid-padding-y">

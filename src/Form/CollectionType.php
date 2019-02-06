@@ -6,6 +6,7 @@ use App\Entity\Collection;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,6 +20,9 @@ class CollectionType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Name der Sammlung'
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Beschrieb der Sammlung'
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Speichern'
