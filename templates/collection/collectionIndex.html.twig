@@ -1,38 +1,63 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="cell">
-    <a href="{{ path('create_collection') }}">Neue Ideensammlung starten</a>
-    <h3>{{ collection.name }}</h3>
-    {% if not collection.adminSettings.votingActive|default(false) %}<a href="{{ path('create_idea', {'collection': collection.id}) }}">Neue Idee erfassen</a>{% endif %}{% if admin %}&nbsp;&nbsp;&nbsp;<a href="{{ path('show_users', {'collection': collection.id}) }}">Administration</a>{% endif %}
-    <p>{{ collection.description|raw }}</p>
-</div>
-<div class="cell">
-    <div class="grid-x grid-padding-x grid-padding-y">
-    {% for idea in ideas %}
-        <div class="cell small-12 large-2"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen"><strong>{{ idea.title }}</strong></a>{% if collection.adminSettings.votingActive|default(false) %} ({{ idea.votes|length }} Stimme/n){% endif %}</div>
-        <div class="cell small-12 large-7">{{ idea.description }}</div>
-        <div class="cell small-4 large-1">{% if not settings.votingActive|default(false) %}<a href="{{ path('edit_idea', {'entity': idea.id}) }}">bearbeiten</a>{% endif %}</div>
-        <div class="cell small-4 large-1"><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('comment_idea', {'entity': idea.id}) }}');">kommentieren</a> ({{ idea.comments|length }})</div>
-        <div class="cell small-4 large-1">{% if collection.adminSettings.votingActive|default(false) %}<td>Für Idee stimmen: <input type="checkbox" name="{{ idea.id }}"{% if idea.getVotesForUser(app.user)|length > 0 %} checked='checked'{% endif %}>{% else %}&nbsp;{% endif %}</div>
-        <div class="cell">&nbsp;</div>
-    {% endfor %}
+<div class="top-bar sticky" data-sticky data-margin-top="0">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li><a href="{{ path('collections_index') }}"><i class="fas fa-chevron-left"></i></a></li>
+            <li class="menu-text">{{ collection.name }}</li>
+        </ul>
+    </div>
+    <div class="top-bar-right">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li>
+                <a href="#"><i class="fas fa-bars"></i></a>
+                <ul class="menu vertical">
+                    {% if admin %}<li><a href="{{ path('show_users', {'collection': collection.id}) }}">Administration</a></li>{% endif %}
+                    <li><a href="{{ path('create_collection') }}">Neue Ideensammlung</a></li>
+                </ul>
+            </li>
+        </ul>
     </div>
 </div>
+<div>
+    <p>{{ collection.description|raw }}</p>
+</div>
+{% if not collection.adminSettings.votingActive|default(false) %}
+<div>
+    <p><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('create_idea', {'collection': collection.id}) }}');"><i class="fas fa-plus"></i></a></p>
+</div>
+{% endif %}
+
+{% for idea in ideas %}
+<div class="ideaContainer callout secondary">
+    <a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen">
+        <div class="idea">{{ idea.title }}</div>
+    </a>
+    <div class="comments" data-toggle="commentsDropdown">{{ idea.comments|length }}</div>
+    <div class="votes" data-toggle="votesDropdown">{{ idea.votes|length }}
+        {% if collection.adminSettings.votingActive|default(false) %}
+        <a href="javascript:voteForIdea({{ idea.id }})">
+            {% if idea.getVotesForUser(app.user)|length > 0 %}<i class="fas fa-toggle-off"></i>
+            {% else %}<i class="fas fa-toggle-on"></i>{% endif %}
+        </a>{% endif %}
+    </div>
+</div>
+{% endfor %}
+<div class="dropdown-pane" id="commentsDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl der Kommentare</div>
+<div class="dropdown-pane" id="votesDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl der Stimmen{% if collection.adminSettings.votingActive|default(false) %}, abstimmen durch Klick auf das Symbol{% endif %}</div>
 {% endblock %}
 
 {% block javascripts %}
 {% if collection.adminSettings.votingActive|default(false) %}
 <script>
-$(document).ready(function() {
-    $('input[type="checkbox"]').on('change', function() {
-        var url = "{{ path('vote_for_idea', {'entity': '__id__'}) }}";
-        url = url.replace('__id__', $(this).attr('name'));
-        $.post(url, function( data ) {
-            location.reload();
-        });
+function voteForIdea(idea) {
+    var url = "{{ path('vote_for_idea', {'entity': '__id__'}) }}";
+    url = url.replace('__id__', idea);
+    $.post(url, function( data ) {
+        location.reload();
     });
-});
+}
 </script>
 {% endif %}
 {% endblock %}

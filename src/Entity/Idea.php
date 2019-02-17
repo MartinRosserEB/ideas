@@ -150,11 +150,15 @@ class Idea {
 
     public function getVotesForUser(User $user)
     {
-        return $this->votes->filter(
-            function ($vote) use ($user) {
-                return $vote->getVoter() === $user;
-            }
-        );
+        $userCollection = $this->getCollection()->getCollectionUserFor($user);
+        if ($userCollection !== null) {
+            return $this->votes->filter(
+                function ($vote) use ($userCollection) {
+                    return $vote->getVoter() === $userCollection;
+                }
+            );
+        }
+        return null;
     }
 
     public function __toString()

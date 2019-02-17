@@ -84,6 +84,19 @@ class Collection
         return $this->collectionUsers;
     }
 
+    public function getCollectionUserFor(User $user)
+    {
+        $userCollection = $this->getCollectionUsers()->filter(
+            function ($collectionUser) use ($user) {
+                return $collectionUser->getUser() === $user;
+            }
+        );
+        if (count($userCollection) > 0) {
+            return $userCollection->first();
+        }
+        return null;
+    }
+
     public function addCollectionUser(UserCollection $userCollection)
     {
         $this->collectionUsers->add($userCollection);

@@ -156,15 +156,34 @@ class IdeaController extends AbstractController
     /**
      * @Route("/show/{entity}", name="show_idea")
      */
-    public function show(Idea $entity, Access $accessSrv)
+    public function show(Request $request, Idea $entity, Access $accessSrv)
     {
-        if (!$accessSrv->checkAccess($this->getUser(), $entity->getCollection())) {
+        $user = $this->getUser();
+        $collection = $entity->getCollection();
+        if (!$accessSrv->checkAccess($user, $collection)) {
             return $this->redirectToRoute('collections_index');
         }
-        $entities = $this->getDoctrine()->getManager()->getRepository(Idea::class)->findAllForIdeaId($entity->getIdeaId());
+        $comment = new Comment();
+        $comment->setCreator($accessSrv->getUserCollections($user, $collection)->first());
+        $comment->setIdea($entity);
+        $form = $this->createForm(CommentType::class, $comment);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment = $form->getData();
+            $comment->setDatetime(new \DateTime('now'));
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($comment);
+            $em->flush();
+
+            return $this->redirectToRoute('collection_index', [
+                'entity' => $collection->getId()
+            ]);
+        }
 
         return $this->render('ideas/show.html.twig', [
-            'entities' => $entities,
+            'idea' => $entity,
+            'form' => $form->createView(),
         ]);
     }
 }
