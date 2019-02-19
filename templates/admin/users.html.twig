@@ -1,11 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="cell">
-    <a href="{{ path('collection_index', {'entity': collection.id}) }}">Zurück zur Ideensammlung</a> | <a href="{{ path('create_user', {'collection': collection.id}) }}">Benutzer erstellen</a> | <a href="{{ path('edit_admin_settings', {'collection': collection.id}) }}">Einstellungen bearbeiten (E-Mailvorlage etc.)</a> | <a href="{{ path('send_mail', {'collection': collection.id}) }}">Mail an alle Benutzer versenden</a>
+<div class="top-bar sticky" data-sticky data-margin-top="0">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li><a href="{{ path('collection_index', {'entity': collection.id}) }}"><i class="fas fa-chevron-left"></i></a></li>
+            <li class="menu-text">{{ collection.name }} - Benutzeradministration</li>
+        </ul>
+    </div>
 </div>
 
-<div class="cell">
+<div><p><a href="{{ path('create_user', {'collection': collection.id}) }}"><i class="fas fa-plus"></i></a></p></div>
+
+<div>
     <table>
         <thead>
             <tr>
@@ -23,7 +30,7 @@
                 <td>{{ collectionUser.familyName }}</td>
                 <td>{{ collectionUser.user.email }}</td>
                 <td>{{ collectionUser.role }}</td>
-                <td><a href="{{ path('edit_user', {'userCollection': collectionUser.id}) }}">bearbeiten</a></td>
+                <td><a href="{{ path('edit_user', {'userCollection': collectionUser.id}) }}"><i class="fas fa-pencil-alt"></i></a></td>
             </tr>
         {% endfor %}
         </tbody>

@@ -5,7 +5,6 @@ namespace App\Form;
 use App\Entity\AdminSettings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -24,10 +23,6 @@ class AdminSettingsType extends AbstractType
             ])
             ->add('mailText', TextareaType::class, [
                 'label' => 'E-Mailvorlage'
-            ])
-            ->add('votingActive', CheckboxType::class, [
-                'label' => 'Wahlmodus aktivieren',
-                'required' => false,
             ])
             ->add('save', SubmitType::class, [
                 'label' => 'Speichern'

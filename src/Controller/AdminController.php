@@ -110,6 +110,24 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Route("settings/mode/toggle/{collection}", name="toggle_mode")
+     */
+    public function toggleMode(Collection $collection, Access $accessSrv)
+    {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $collection->getAdminSettings()->setVotingActive(!$collection->getAdminSettings()->getVotingActive());
+        $em->flush();
+
+        return $this->redirectToRoute("collection_index", [
+            'entity' => $collection->getId(),
+        ]);
+    }
+
+    /**
      * @Route("settings/edit/{collection}", name="edit_admin_settings")
      */
     public function editAdminSettings(Request $request, Collection $collection, Access $accessSrv)

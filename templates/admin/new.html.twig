@@ -1,11 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="cell">
-    <a href="{{ path('show_users', {'collection': collection.id}) }}">Zurück zur Übersicht</a>
+<div class="top-bar sticky" data-sticky data-margin-top="0">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li><a href="{{ path('show_users', {'collection': collection.id}) }}"><i class="fas fa-chevron-left"></i></a></li>
+            <li class="menu-text">{{ collection.name }} - neuen Benutzer erfassen</li>
+        </ul>
+    </div>
 </div>
 
-<div class="cell">
+<div><p>&nbsp;</p></div>
+
+<div>
     {{ form(form) }}
 </div>
 {% endblock %}

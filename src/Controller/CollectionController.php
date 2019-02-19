@@ -7,6 +7,7 @@ use App\Entity\Collection;
 use App\Entity\Idea;
 use App\Entity\UserCollection;
 use App\Form\CollectionType;
+use App\Form\IdeaType;
 use App\Service\Access;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,40 +18,7 @@ class CollectionController extends AbstractController
     /**
      * @Route("/", name="collections_index")
      */
-    public function collectionsIndex()
-    {
-        $userCollections = $this->getUser()->getUserCollections();
-        if (count($userCollections) === 1) {
-            return $this->redirectToRoute('collection_index', [
-                'entity' => $userCollections->first()->getCollection()->getId()
-            ]);
-        }
-
-        return $this->render('collection/collectionsIndex.html.twig', [
-            'userCollections' => $userCollections,
-        ]);
-    }
-
-    /**
-     * @Route("/collection/{entity}", name="collection_index")
-     */
-    public function collectionIndex(Collection $entity, Access $accessSrv)
-    {
-        if (!$accessSrv->checkAccess($this->getUser(), $entity)) {
-            return $this->redirectToRoute('collections_index');
-        }
-
-        return $this->render('collection/collectionIndex.html.twig', [
-            'collection' => $entity,
-            'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
-            'admin' => $accessSrv->checkAccess($this->getUser(), $entity, true),
-        ]);
-    }
-
-    /**
-     * @Route("/create", name="create_collection")
-     */
-    public function create(Request $request)
+    public function collectionsIndex(Request $request)
     {
         $collection = new Collection();
         $form = $this->createForm(CollectionType::class, $collection);
@@ -82,8 +50,40 @@ class CollectionController extends AbstractController
             ]);
         }
 
-        return $this->render('collection/new.html.twig', [
+        $userCollections = $this->getUser()->getUserCollections();
+        if (count($userCollections) === 1) {
+            return $this->redirectToRoute('collection_index', [
+                'entity' => $userCollections->first()->getCollection()->getId()
+            ]);
+        }
+
+        return $this->render('collection/collectionsIndex.html.twig', [
+            'userCollections' => $userCollections,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/collection/{entity}", name="collection_index")
+     */
+    public function collectionIndex(Collection $entity, Access $accessSrv)
+    {
+        if (!$accessSrv->checkAccess($this->getUser(), $entity)) {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $idea = new Idea();
+        $form = $this->createForm(IdeaType::class, $idea, [
+            'action' => $this->generateUrl('create_idea', [
+                'collection' => $entity->getId(),
+            ])
+        ]);
+
+        return $this->render('collection/collectionIndex.html.twig', [
+            'collection' => $entity,
+            'form' => $form->createView(),
+            'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
+            'admin' => $accessSrv->checkAccess($this->getUser(), $entity, true),
         ]);
     }
 }

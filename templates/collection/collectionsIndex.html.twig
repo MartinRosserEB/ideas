@@ -1,12 +1,22 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="cell">Zur Verfügung stehende Ideensammlungen:</div>
-<div class="cell">
-    <div class="grid-x grid-padding-y">
-    {% for userCollection in userCollections %}
-        <div class="cell"><a href="{{ path('collection_index', {'entity': userCollection.collection.id }) }}"><strong>{{ userCollection.collection }}</strong></a></div>
-    {% endfor %}
+<div class="top-bar sticky" data-sticky data-margin-top="0">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">Ideensammlungen</li>
+        </ul>
     </div>
 </div>
+
+<div><p></p></div>
+<div><p><a href="#" onclick="javascript:$('#createCollection').show();"><i class="fas fa-plus"></i></a></p></div>
+
+<div id="createCollection" style="display: none;">
+    {{ form(form) }}
+</div>
+
+{% for userCollection in userCollections %}
+    <div class="ideaContainer callout secondary"><a href="{{ path('collection_index', {'entity': userCollection.collection.id }) }}"><h5>{{ userCollection.collection }}</h5></a> <i>{% if userCollection.collection.adminSettings.votingActive|default(false) %}abstimmen{% else %}sammeln{% endif %}</i></div>
+{% endfor %}
 {% endblock %}

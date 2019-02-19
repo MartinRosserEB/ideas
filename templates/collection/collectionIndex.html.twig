@@ -13,8 +13,11 @@
             <li>
                 <a href="#"><i class="fas fa-bars"></i></a>
                 <ul class="menu vertical">
-                    {% if admin %}<li><a href="{{ path('show_users', {'collection': collection.id}) }}">Administration</a></li>{% endif %}
-                    <li><a href="{{ path('create_collection') }}">Neue Ideensammlung</a></li>
+                    {% if admin %}
+                        <li><a href="{{ path('edit_admin_settings', {'collection': collection.id}) }}">Mailvorlage</a></li>
+                        <li><a href="{{ path('toggle_mode', {'collection': collection.id}) }}">{% if collection.adminSettings.votingActive %}Sammelmodus{% else %}Wahlmodus{% endif %} aktivieren</a></li>
+                        <li><a href="{{ path('show_users', {'collection': collection.id}) }}">Benutzer administrieren</a></li>
+                    {% endif %}
                 </ul>
             </li>
         </ul>
@@ -25,14 +28,18 @@
 </div>
 {% if not collection.adminSettings.votingActive|default(false) %}
 <div>
-    <p><a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('create_idea', {'collection': collection.id}) }}');"><i class="fas fa-plus"></i></a></p>
+    <p><a href="#" onclick="javascript:$('#newIdea').show();"><i class="fas fa-plus"></i></a></p>
+</div>
+<div id="newIdea" style="display:none;">
+    {{ form(form) }}
+    <hr>
 </div>
 {% endif %}
 
 {% for idea in ideas %}
 <div class="ideaContainer callout secondary">
-    <a href="#" onclick="javascript:loadFromUrlOpenModal('{{ path('show_idea', {'entity': idea.id}) }}');" label="anzeigen">
-        <div class="idea">{{ idea.title }}</div>
+    <a href="#" onclick="javascript:toggleLoadFromUrl('{{ path('show_idea', {'entity': idea.id}) }}', '#ideaExpanded_{{ idea.id }}');" label="anzeigen">
+        <div class="idea"><h5>{{ idea.title }}</h5></div>
     </a>
     <div class="comments" data-toggle="commentsDropdown">{{ idea.comments|length }}</div>
     <div class="votes" data-toggle="votesDropdown">{{ idea.votes|length }}
@@ -42,10 +49,11 @@
             {% else %}<i class="fas fa-toggle-on"></i>{% endif %}
         </a>{% endif %}
     </div>
+    <div id="ideaExpanded_{{ idea.id }}"></div>
 </div>
 {% endfor %}
-<div class="dropdown-pane" id="commentsDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl der Kommentare</div>
-<div class="dropdown-pane" id="votesDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl der Stimmen{% if collection.adminSettings.votingActive|default(false) %}, abstimmen durch Klick auf das Symbol{% endif %}</div>
+<div class="dropdown-pane" id="commentsDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl Kommentare</div>
+<div class="dropdown-pane" id="votesDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl Stimmen</div>
 {% endblock %}
 
 {% block javascripts %}

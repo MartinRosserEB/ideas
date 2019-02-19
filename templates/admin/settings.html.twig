@@ -1,20 +1,36 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="cell">
-    <a href="{{ path('show_users', {'collection': collection.id}) }}">Zurück zur Übersicht</a>
+<div class="top-bar sticky" data-sticky data-margin-top="0">
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li><a href="{{ path('collection_index', {'entity': collection.id}) }}"><i class="fas fa-chevron-left"></i></a></li>
+            <li class="menu-text">{{ collection.name }} - Mailvorlage</li>
+        </ul>
+    </div>
+    <div class="top-bar-right">
+        <ul class="dropdown menu" data-dropdown-menu>
+            <li>
+                <a href="#"><i class="fas fa-bars"></i></a>
+                <ul class="menu vertical">
+                    <li><a href="{{ path('send_mail', {'collection': collection.id}) }}">Mail an alle Benutzer senden</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 
-<div class="cell">
-    <p>Hinweise zur E-Mailvorlage:</p>
-    <p>Folgende Zeichenketten werden durch Variablen ersetzt.</p>
+<div><p>&nbsp;</p></div>
+
+<div>
+    <p>Folgende Zeichenketten in der Mailvorlage werden ersetzt:</p>
     <ul>
         <li><i>%Vorname%</i> - ersetzt durch Vornamen der Person</li>
         <li><i>%Nachname%</i> - ersetzt durch Nachnamen der Person</li>
         <li><i>%Link%</i> - ersetzt durch Login-Link der Person (benötigt, damit die Person einloggen kann)</li>
     </ul>
 </div>
-<div class="cell">
+<div>
     {{ form(form) }}
 </div>
 {% endblock %}
