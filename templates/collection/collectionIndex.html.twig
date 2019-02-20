@@ -28,7 +28,7 @@
 </div>
 {% if not collection.adminSettings.votingActive|default(false) %}
 <div>
-    <p><a href="#" onclick="javascript:$('#newIdea').show();"><i class="fas fa-plus"></i></a></p>
+    <p><a href="javascript:void(0);" onclick="javascript:$('#newIdea').show();"><i class="fas fa-plus"></i></a></p>
 </div>
 <div id="newIdea" style="display:none;">
     {{ form(form) }}
@@ -38,32 +38,41 @@
 
 {% for idea in ideas %}
 <div class="ideaContainer callout secondary">
-    <a href="#" onclick="javascript:toggleLoadFromUrl('{{ path('show_idea', {'entity': idea.id}) }}', '#ideaExpanded_{{ idea.id }}');" label="anzeigen">
+    <a href="javascript:void(0);" onclick="javascript:toggleLoadFromUrl('{{ path('show_idea', {'entity': idea.id}) }}', '#ideaExpanded_{{ idea.id }}');" label="anzeigen">
         <div class="idea"><h5>{{ idea.title }}</h5></div>
     </a>
     <div class="comments" data-toggle="commentsDropdown">{{ idea.comments|length }}</div>
-    <div class="votes" data-toggle="votesDropdown">{{ idea.votes|length }}
+    <div class="votes"{% if not collection.adminSettings.votingActive|default(false) %} data-toggle="votesDropdown"{% endif %}>
+        <span id="votesCountIdea_{{ idea.id }}">{{ idea.votes|length }}</span>
         {% if collection.adminSettings.votingActive|default(false) %}
-        <a href="javascript:voteForIdea({{ idea.id }})">
-            {% if idea.getVotesForUser(app.user)|length > 0 %}<i class="fas fa-toggle-off"></i>
-            {% else %}<i class="fas fa-toggle-on"></i>{% endif %}
+        <a href="javascript:toggleVoteForIdea({{ idea.id }})">
+        <i id="votesSymbolIdea_{{ idea.id }}" class="fas
+            {%- if idea.getVotesForUser(app.user)|length > 0 %} fa-toggle-off
+            {%- else %} fa-toggle-on
+            {%- endif -%}
+        "></i>
         </a>{% endif %}
     </div>
     <div id="ideaExpanded_{{ idea.id }}"></div>
 </div>
 {% endfor %}
 <div class="dropdown-pane" id="commentsDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl Kommentare</div>
+{% if not collection.adminSettings.votingActive|default(false) %}
 <div class="dropdown-pane" id="votesDropdown" data-dropdown data-hover="true" data-hover-pane="true">Anzahl Stimmen</div>
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}
 {% if collection.adminSettings.votingActive|default(false) %}
 <script>
-function voteForIdea(idea) {
+function toggleVoteForIdea(idea) {
     var url = "{{ path('vote_for_idea', {'entity': '__id__'}) }}";
     url = url.replace('__id__', idea);
     $.post(url, function( data ) {
-        location.reload();
+        if (data.success === true) {
+            $("#votesSymbolIdea_"+idea).toggleClass('fa-toggle-off fa-toggle-on');
+            $("#votesCountIdea_"+idea).html(data.voteCount);
+        }
     });
 }
 </script>

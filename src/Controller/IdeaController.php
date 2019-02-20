@@ -78,7 +78,10 @@ class IdeaController extends AbstractController
             }
         }
 
-        return new JsonResponse(['success' => true]);
+        return new JsonResponse([
+            'success' => true,
+            'voteCount' => count($entity->getVotes()),
+        ]);
     }
 
     /**
