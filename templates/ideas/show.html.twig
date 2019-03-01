@@ -1,21 +1,19 @@
 {% block body %}
 <div>
-    <p><i>{{ idea.creator}}</i> <a href="javascript:void(0);" onclick="javascript:loadFromUrlOpenModal('{{ path('edit_idea', {'entity': idea.id}) }}');"><i class="fas fa-pencil-alt"></i></a></p>
-    <p>{{ idea.description }}</p>
+    <p><i>{{ idea.creator}}</i>{% if not idea.collection.adminSettings.votingActive %} <a href="javascript:void(0);" onclick="javascript:loadFromUrlOpenModal('{{ path('edit_idea', {'entity': idea.id}) }}');"><i class="fas fa-pencil-alt"></i></a>{% endif %}</p>
+    <div>{{ idea.description|markdown }}</div>
     {% if idea.comments|length > 0 %}<hr><p><strong>Kommentar(e):</strong></p>
         {% for comment in idea.comments %}
-            <p>{{ comment.comment }}<br /><i>{{ comment.creator }}, {{ comment.datetime|date('d.m.Y H:i') }}</i></p>
+            <div>{{ comment.comment|markdown }}</div><i>{{ comment.creator }}, {{ comment.datetime|date('d.m.Y H:i') }}</i></p>
         {% endfor %}
-        <a href="javascript:void(0);" onclick="javascript:$('#ideaCommentForm_{{ idea.id }}').show()"><i class="fas fa-plus"></i></a>
+    {% endif %}
+        <a href="javascript:void(0);" onclick="javascript:$('#ideaCommentForm_{{ idea.id }}').show()"><i class="fas fa-comment"></i></a>
         <div id="ideaCommentForm_{{ idea.id }}" style="display: none;">
-            {{ form_start(form, {'action': path('comment_idea', {'entity': idea.id}), 'attr': {'id': 'modalForm'}}) }}
+            {{ form_start(form, {'action': path('show_idea', {'entity': idea.id}), 'attr': {'id': 'modalForm'}}) }}
             {{ form_widget(form) }}
             {{ form_end(form) }}
         </div>
         <hr>
-    {% else %}
-        <hr>
-    {% endif %}
-    <p><strong>{{ idea.votes|length }} Stimme(n)</strong></p>
+    <p><strong>{% if idea.collection.adminSettings.anonymousVote %}{{ idea.votes|length }} Stimme(n){% else %}Stimme(n): {% for vote in idea.votes %}{{ vote.voter }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</strong></p>
 </div>
 {% endblock %}

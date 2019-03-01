@@ -27,7 +27,11 @@ class IdeaController extends AbstractController
             return $this->redirectToRoute('collections_index');
         }
 
-        $form = $this->createForm(IdeaType::class, $entity);
+        $form = $this->createForm(IdeaType::class, $entity, [
+            'action' => $this->generateUrl('edit_idea', [
+                'entity' => $entity->getId(),
+            ])
+        ]);
 
         $form->handleRequest($request);
 
@@ -81,42 +85,6 @@ class IdeaController extends AbstractController
         return new JsonResponse([
             'success' => true,
             'voteCount' => count($entity->getVotes()),
-        ]);
-    }
-
-    /**
-     * @Route("/comment/{entity}", name="comment_idea")
-     */
-    public function comment(Request $request, ValidatorInterface $validator, Idea $entity, Access $accessSrv)
-    {
-        $collection = $entity->getCollection();
-        $user = $this->getUser();
-        if (!$accessSrv->checkAccess($user, $collection)) {
-            return $this->redirectToRoute('collections_index');
-        }
-
-        $comment = new Comment();
-        $comment->setCreator($accessSrv->getUserCollections($user, $collection)->first());
-        $comment->setIdea($entity);
-        $form = $this->createForm(CommentType::class, $comment);
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $comment = $form->getData();
-            $comment->setDatetime(new \DateTime('now'));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($comment);
-            $em->flush();
-
-            return $this->redirectToRoute('collection_index', [
-                'entity' => $collection->getId()
-            ]);
-        }
-
-        return $this->render('ideas/comment.html.twig', [
-            'form' => $form->createView(),
-            'idea' => $entity,
         ]);
     }
 

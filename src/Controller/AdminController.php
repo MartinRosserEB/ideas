@@ -128,6 +128,24 @@ class AdminController extends AbstractController
     }
 
     /**
+     * @Route("settings/vote/anonymous/toggle/{collection}", name="toggle_anonymous_vote")
+     */
+    public function toggleAnonymousVote(Collection $collection, Access $accessSrv)
+    {
+        if (!$accessSrv->checkAccess($this->getUser(), $collection, true)) {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $collection->getAdminSettings()->setAnonymousVote(!$collection->getAdminSettings()->getAnonymousVote());
+        $em->flush();
+
+        return $this->redirectToRoute("collection_index", [
+            'entity' => $collection->getId(),
+        ]);
+    }
+
+    /**
      * @Route("settings/edit/{collection}", name="edit_admin_settings")
      */
     public function editAdminSettings(Request $request, Collection $collection, Access $accessSrv)

@@ -27,12 +27,13 @@ class CollectionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $collection = $form->getData();
-            $collection->setDescription(nl2br($collection->getDescription()));
+            $collection->setDescription($collection->getDescription());
             $user = $this->getUser();
             $existingUC = $user->getUserCollections()->first();
             $adminSettings = new AdminSettings();
             $adminSettings->setCollection($collection)
-                ->setVotingActive(false);
+                ->setVotingActive(false)
+                ->setAnonymousVote(true);
             $userCollection = new UserCollection();
             $userCollection->setCollection($collection)
                 ->setUser($user)
@@ -84,6 +85,34 @@ class CollectionController extends AbstractController
             'form' => $form->createView(),
             'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
             'admin' => $accessSrv->checkAccess($this->getUser(), $entity, true),
+        ]);
+    }
+
+    /**
+     * @Route("/collection/{entity}/edit", name="collection_edit")
+     */
+    public function collectionEdit(Request $request, Collection $entity, Access $accessSrv)
+    {
+        if (!$accessSrv->checkAccess($this->getUser(), $entity, true)) {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        $form = $this->createForm(CollectionType::class, $entity);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entity = $form->getData();
+            $this->getDoctrine()->getManager()->flush();
+
+            return $this->redirectToRoute("collection_index", [
+                "entity" => $entity->getId(),
+            ]);
+        }
+
+        return $this->render('collection/collectionEdit.html.twig', [
+            'form' => $form->createView(),
+            'collection' => $entity,
         ]);
     }
 }

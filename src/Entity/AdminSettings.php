@@ -45,6 +45,13 @@ class AdminSettings {
      */
     private $votingActive;
 
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $anonymousVote;
+
     public function getId(): int
     {
         return $this->id;
@@ -92,5 +99,17 @@ class AdminSettings {
     public function getVotingActive()
     {
         return $this->votingActive;
+    }
+
+    public function setAnonymousVote($anonymousVote)
+    {
+        $this->anonymousVote = $anonymousVote;
+
+        return $this;
+    }
+
+    public function getAnonymousVote()
+    {
+        return $this->anonymousVote;
     }
 }
