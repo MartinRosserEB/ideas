@@ -23,6 +23,7 @@ class CollectionController extends AbstractController
     public function collectionsIndex(Request $request)
     {
         $collection = new Collection();
+        $collection->setDescription(Collection::$defaultText);
         $form = $this->createForm(CollectionType::class, $collection);
 
         $form->handleRequest($request);

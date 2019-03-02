@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Collection
 {
+    public static $defaultText = "---\n\n### Phase 1\n\nBenutzer werden erfasst, eine Mailvorlage vorbereitet und versendet. Anschliessend können alle Benutzer über ihren persönlichen Link einloggen und Ideen eintragen sowie kommentieren.\n\n### Phase 2\n\nDer Wahlmodus wird aktiviert. Z.B. nach neuerlichem Mailversand können alle teilnehmenden Benutzer über ihren persönlichen Link einloggen und für ihre favorisierten Ideen abstimmen.\n\n#### Formatierungshinweise\n\n[Das ist ein Link](http://www.handherz.ch/). Horizontale Trennstriche werden durch drei Minuszeichen erstellt (Beispiel am Anfang und am Ende).\n\n* Listen werden mit dem Stern kreiert.\n* Eine Liste kann mehrere Punkte beinhalten.\n\n---";
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
