@@ -22,7 +22,7 @@
     <body>
         <h2>{{ collection.name }}</h2>
         <p>Export vom {{ "now"|date("d.m.Y, H:s") }}</p>
-        {% if collection.description %}<p>{{ collection.description }}</p>{% endif %}
+        {% if collection.description %}<p>{{ collection.description|markdown }}</p>{% endif %}
         <h4>Beteiligte Personen:</h4>
         <ul>
             {% for user in collection.collectionUsers %}
