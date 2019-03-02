@@ -9,6 +9,8 @@ use App\Entity\UserCollection;
 use App\Form\CollectionType;
 use App\Form\IdeaType;
 use App\Service\Access;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -85,6 +87,37 @@ class CollectionController extends AbstractController
             'form' => $form->createView(),
             'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
             'admin' => $accessSrv->checkAccess($this->getUser(), $entity, true),
+        ]);
+    }
+
+    /**
+     * @Route("/collection/{entity}/export/pdf", name="collection_export_pdf")
+     */
+    public function collectionExportPdf(Collection $entity, Access $accessSrv)
+    {
+        if (!$accessSrv->checkAccess($this->getUser(), $entity, true)) {
+            return $this->redirectToRoute('collections_index');
+        }
+
+        // Configure Dompdf according to your needs
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        
+        // Instantiate Dompdf with our options
+        $dompdf = new Dompdf($pdfOptions);
+        
+        // Retrieve the HTML generated in our twig file
+        $html = $this->renderView('collection/pdfExport.html.twig', [
+            'collection' => $entity,
+            'ideas' => $this->getDoctrine()->getManager()->getRepository(Idea::class)->findLatestDistinctIdeas($entity),
+        ]);
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $dompdf->stream("Export.pdf", [
+            "Attachment" => true
         ]);
     }
 

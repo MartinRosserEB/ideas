@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ collection.name }}, {{ "now"|date("d.m.Y, H:s") }}</title>
+        <style>
+            .pageBreak {
+                page-break-before: always;
+            }
+            table {
+                border-collapse: collapse;
+            }
+            td, th {
+                vertical-align: top;
+                border-bottom: 1px solid black;
+            }
+            table p {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>{{ collection.name }}</h2>
+        <p>Export vom {{ "now"|date("d.m.Y, H:s") }}</p>
+        {% if collection.description %}<p>{{ collection.description }}</p>{% endif %}
+        <h4>Beteiligte Personen:</h4>
+        <ul>
+            {% for user in collection.collectionUsers %}
+                <li>{{ user }}, <a href="mailto:{{ user.user.email }}">{{ user.user.email }}</a></li>
+            {% endfor %}
+        </ul>
+        <h4 class="pageBreak">Ideen:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 10%;">Titel und Autor</th>
+                    <th style="width: 35%;">Beschrieb</th>
+                    <th style="width: 35%;">Kommentare</th>
+                    <th style="width: 20%;">Stimmen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for idea in ideas %}
+                    <tr>
+                        <td>{{ idea.title }}<br /><i>{{ idea.creator }}, {{ idea.datetime|date("d.m.Y, H:s") }}</i></td>
+                        <td>{{ idea.description|markdown }}</td>
+                        <td>
+                            {%- for comment in idea.comments -%}
+                            <p>{{ comment.comment }}<br /><i>{{ comment.creator }}, {{ comment.datetime|date("d.m.Y, H:s") }}</i></p>
+                            {%- endfor -%}
+                        </td>
+                        <td>
+                            <p>Anzahl Stimmen: {{ idea.votes|length }}</p>
+                            {% if idea.votes|length > 0 %}
+                                <p>
+                                {%- for vote in idea.votes %}
+                                {{ vote.voter}}{% if not loop.last %}, <br />{% endif %}
+                                {% endfor %}
+                                </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </body>
+</html>
