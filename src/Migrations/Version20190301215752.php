@@ -38,8 +38,8 @@ final class Version20190301215752 extends AbstractMigration implements Container
         $em = $this->container->get('doctrine.orm.entity_manager');
         $collections = $em->getRepository(Collection::class)->findAll();
         foreach ($collections as $collection) {
-            $collection->setDescription(str_replace("<br />", "", $collection->getDescription()))
-                ->setAnonymousVote(true);
+            $collection->setDescription(str_replace("<br />", "", $collection->getDescription()));
+	    $collection->getAdminSettings()->setAnonymousVote(true);
         }
         $ideas = $em->getRepository(Idea::class)->findAll();
         foreach ($ideas as $idea) {
